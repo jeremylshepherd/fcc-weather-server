@@ -12,7 +12,7 @@ require('dotenv').load();
 var routes = require('./routes/index');
 app.set('view engine', 'ejs');
 
-mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/weatherapp', { useMongoClient: true }, function(err, db) {
+mongoose.connect(process.env.MONGOLAB_URI || process.env.MONGODB_URI, { useMongoClient: true }, function(err, db) {
   if(err) {console.log(err);}
 
   console.log('Connected to weatherapp');
