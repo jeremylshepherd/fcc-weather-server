@@ -1,0 +1,23 @@
+{
+  "name": "weather-app-server",
+  "version": "0.0.0",
+  "description": "Personal Wrapper for DarkSky API",
+  "main": "server.js",
+  "repository": "",
+  "author": "Jeremy L. Shepherd <jeremylshepherd@gmail.com>",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "cookie-parser": "^1.4.0",
+    "cors": "^2.7.1",
+    "dotenv": "^2.0.0",
+    "ejs": "^2.3.4",
+    "express": "^4.13.3",
+    "mongoose": "^4.4.12",
+    "path": "^0.12.7",
+    "request": "^2.85.0",
+    "serve-favicon": "^2.5.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.9.0"
+  }
+}
