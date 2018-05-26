@@ -4,15 +4,89 @@ const express = require('express');
 const mongoose = require('mongoose');
 const request = require('request');
 const Data = require('../models/Data.js');
+const zipLatLon = require('../zipLatLon');
+const Location = require('../models/Location.js');
 const cors = require('cors');
 
 const router = express.Router();
 
 const hour = 3600000;
 const url = `https://api.forecast.io/forecast/${process.env.API_KEY}`;
+const locationURL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=`;
+const zipURL = `https://cdn.rawgit.com/jeremylshepherd/3e6627d0da798d85da8adf4694a3e4d1/raw/7a2bbe0a50335dd7b25fa2258569f3404375b0ea/zipcodeLatLong.json`;
+
+const getAddress = (obj, res) => {
+    request(`${locationURL}${obj.lat},${obj.lon}&sensor=false`, (locErr, locResponse, locBody) => {
+        if(locErr) { res.json(locErr); }
+        if(+locResponse.statusCode === 200) {
+            let data = JSON.parse(locBody);
+            if(data.status.toUpperCase() !== "OK") {
+                return res.status(503).send('Google Maps Location Service are currently unavailable. Please try again later.');
+                
+            }
+            const userLoc = data.results[0].formatted_address;
+            const locArr = userLoc.split(",");
+            locArr.shift();
+            locArr.pop();
+            let location = locArr.join(",");
+            obj.address = location;
+            if(!obj.zip) {
+                obj.zip = +location.slice(-5);
+            }
+            let newLocation = new Location(obj);
+            newLocation.save((error, location) => {
+                if(error) {
+                    res.json(error);
+                }else{
+                    res.json(location);
+                }
+            });
+        }
+    });
+};
 
 router.get('/', (req, res) => {
   res.render('index.ejs');
+});
+
+//Take in a zip code and get the coordinates and address, then store in a record for future use.
+router.get('/api/zip/:zip', (req, res) => {
+    let parZip = +req.params.zip;
+    Location.findOne({ 'zip': parZip }, (dbError, zip) => {
+        if(dbError) res.json(dbError);
+        if(zip) {
+            res.json(zip);
+        }else{
+            let zips = zipLatLon.map((d) => d.ZIP);
+            let subZip = zips.indexOf(parZip.toString());
+            if(subZip !== -1) {
+                let coords = zipLatLon[subZip];
+                let obj = {};
+                obj.lat = (+coords.LAT).toFixed(2).toString();
+                obj.lon = (+coords.LONG).toFixed(2).toString();
+                obj.zip = parZip;
+                getAddress(obj, res);
+            }else{
+                return res.status(404).send('Zip code not found, please check zip and try again.');
+            }
+        }
+    });
+});
+
+router.get('/api/coords/:coords', (req, res) => {
+    let splitCoords = req.params.coords.split(',');
+    console.log(splitCoords);
+    let obj = {};
+    obj.lat = (+splitCoords[0]).toFixed(2).toString();
+    obj.lon = (+splitCoords[1]).toFixed(2).toString();
+    Location.findOne({ lat: obj.lat, lon: obj.lon }, (err, location) => {
+        if(err) { res.json(err); }
+        if(location) {
+            res.json(location);
+        }else{
+            getAddress(obj, res);
+        }
+    });
 });
 
 router.get('/api/:coords', cors(), (req, res) => {
@@ -60,6 +134,5 @@ router.get('/api/:coords', cors(), (req, res) => {
         }
     });
 });
-
 
 module.exports = router;
