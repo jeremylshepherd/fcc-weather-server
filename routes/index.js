@@ -13,7 +13,6 @@ const router = express.Router();
 const hour = 3600000;
 const url = `https://api.forecast.io/forecast/${process.env.API_KEY}`;
 const locationURL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=`;
-const zipURL = `https://cdn.rawgit.com/jeremylshepherd/3e6627d0da798d85da8adf4694a3e4d1/raw/7a2bbe0a50335dd7b25fa2258569f3404375b0ea/zipcodeLatLong.json`;
 
 const getAddress = (obj, res) => {
     request(`${locationURL}${obj.lat},${obj.lon}&sensor=false`, (locErr, locResponse, locBody) => {
@@ -50,7 +49,7 @@ router.get('/', (req, res) => {
 });
 
 //Take in a zip code and get the coordinates and address, then store in a record for future use.
-router.get('/api/zip/:zip', (req, res) => {
+router.get('/api/zip/:zip', cors(), (req, res) => {
     let parZip = +req.params.zip;
     Location.findOne({ 'zip': parZip }, (dbError, zip) => {
         if(dbError) res.json(dbError);
@@ -73,7 +72,7 @@ router.get('/api/zip/:zip', (req, res) => {
     });
 });
 
-router.get('/api/coords/:coords', (req, res) => {
+router.get('/api/coords/:coords', cors(), (req, res) => {
     let splitCoords = req.params.coords.split(',');
     console.log(splitCoords);
     let obj = {};
