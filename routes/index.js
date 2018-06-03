@@ -43,6 +43,13 @@ const getAddress = (obj, res) => {
         }
     });
 };
+const roundCoords = (str) => {
+    let arr = str.split(',').map((a) => (+a).toFixed(2));
+    let obj = {};
+    obj.lat = arr[0];
+    obj.lon = arr[1];
+    return obj;
+};
 
 router.get('/', (req, res) => {
   res.render('index.ejs');
@@ -73,10 +80,7 @@ router.get('/api/zip/:zip', cors(), (req, res) => {
 });
 
 router.get('/api/coords/:coords', cors(), (req, res) => {
-    let splitCoords = req.params.coords.split(',');
-    let obj = {};
-    obj.lat = (+splitCoords[0]).toFixed(2).toString();
-    obj.lon = (+splitCoords[1]).toFixed(2).toString();
+    let obj = roundCoords(req.params.coords);
     Location.findOne({ lat: obj.lat, lon: obj.lon }, (err, location) => {
         if(err) { res.json(err); }
         if(location) {
@@ -88,10 +92,7 @@ router.get('/api/coords/:coords', cors(), (req, res) => {
 });
 
 router.get('/api/:coords', cors(), (req, res) => {
-    let splitCoords = req.params.coords.split(',');
-    let obj = {};
-    obj.lat = (+splitCoords[0]).toFixed(2).toString();
-    obj.lon = (+splitCoords[1]).toFixed(2).toString();
+    let obj = roundCoords(req.params.coords);
     let coords = `${obj.lat},${obj.lon}`;
     Data.findOne({ 'coords': coords}, (dataErr, record) => {
         if(dataErr) return res.json(dataErr);
@@ -103,7 +104,7 @@ router.get('/api/:coords', cors(), (req, res) => {
             return res.json(record);
         }else if(record && !fresh){
             console.log('Updating record');
-            request.get(`${url}/${req.params.coords}`, (reqErr, response, body) => {
+            request.get(`${url}/${coords}`, (reqErr, response, body) => {
                 if(reqErr) return reqErr;
                 if(+response.statusCode === 200) {
                     record.apiResponse = JSON.parse(body);
@@ -118,11 +119,11 @@ router.get('/api/:coords', cors(), (req, res) => {
             });
          }else{
             console.log('Record not found');
-             request.get(`${url}/${req.params.coords}`, (reqErr2, response, body) => {
+             request.get(`${url}/${coords}`, (reqErr2, response, body) => {
                 if(reqErr2) return reqErr2;
                 if(+response.statusCode === 200) {
                     const newRecord = {};
-                    newRecord.coords = req.params.coords;
+                    newRecord.coords = coords;
                     newRecord.apiResponse = JSON.parse(body);
                     newRecord.date = Date.now();
                     const data = new Data(newRecord);
