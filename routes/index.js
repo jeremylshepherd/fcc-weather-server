@@ -74,7 +74,6 @@ router.get('/api/zip/:zip', cors(), (req, res) => {
 
 router.get('/api/coords/:coords', cors(), (req, res) => {
     let splitCoords = req.params.coords.split(',');
-    console.log(splitCoords);
     let obj = {};
     obj.lat = (+splitCoords[0]).toFixed(2).toString();
     obj.lon = (+splitCoords[1]).toFixed(2).toString();
@@ -89,7 +88,12 @@ router.get('/api/coords/:coords', cors(), (req, res) => {
 });
 
 router.get('/api/:coords', cors(), (req, res) => {
-    Data.findOne({ 'coords': req.params.coords}, (dataErr, record) => {
+    let splitCoords = req.params.coords.split(',');
+    let obj = {};
+    obj.lat = (+splitCoords[0]).toFixed(2).toString();
+    obj.lon = (+splitCoords[1]).toFixed(2).toString();
+    let coords = `${obj.lat},${obj.lon}`;
+    Data.findOne({ 'coords': coords}, (dataErr, record) => {
         if(dataErr) return res.json(dataErr);
         const time = record ? record.date.getTime() : null;
         const expires = time + hour;

@@ -4,9 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>freeCodeCamp Weather API</title>
 </head>
 <body>
-    <h1>External API Test</h1>
+    <% var coordsCall = {_id: 'ObjectID',lat: "39.76",lon: "-84.21",address: " Dayton, OH 45402",zip: 45402,__v: 0}%>
+    <% var zipCall = {_id: 'ObjectID',lat: "39.76",lon: "-84.21",address: " Dayton, OH 45402",zip: 45402,__v: 0}%>
+    <% var weatherCall = {_id: 'ObjectID', coords: "39.76,-84.21", apiResponse: { offset: -4, flags: {}, daily: {}, 
+                        hourly: {}, minutely: {}, currently: {}, timezone: "America/New_York", longitude: -84.21, latitude: 39.76}, 
+                        date: "2018-06-03T14:49:20.999Z", __v: 0} %>
+    <div class="container">
+        <h1 class="header">
+            <i class="fa fa-free-code-camp"></i> freeCodeCamp Weather API
+        </h1>
+        <blockquote>
+            This API is powered by the DarkSky API and Google Maps Geolocation API. This API allows for a finer degree of control over API calls and provides more graceful failures than the native APIs.
+            <h4>You can pass latitude longitude coordinates as a string to <code><%='/api/coords/<lat>,<lon>'%></code> and it will return location information.</h4>
+            <h4>You can pass a five digit zipcode to <code><%='/api/zip/<zip>'%></code> and it will return location information.</h4>
+            <h4>You can pass latitude longitude coordinates to <code><%='/api/<lat>,<lon>'%></code> to receive to get weather data (external API is only called if no previous weather data exists or data is older than 1 hour.)</h4>
+        </blockquote>
+        <h3>Examples:</h3>
+        <code>https://fcc-weather-server.herokuapp.com/api/coords/39.7574433,-84.2094347</code><br>
+        <pre><%= JSON.stringify(coordsCall, null, 2) %></pre>
+        <code>https://fcc-weather-server.herokuapp.com/api/zip/45402</code>
+        <pre><%= JSON.stringify(zipCall, null, 2) %></pre>
+        <code>https://fcc-weather-server.herokuapp.com/api/39.7574433,-84.2094347</code><br>
+        <pre><%= JSON.stringify(weatherCall, null, 2) %></pre>
+    </div>
 </body>
 </html>
