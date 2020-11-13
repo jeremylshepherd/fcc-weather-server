@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Personal Wrapper for DarkSky API",
   "main": "server.js",
-  "repository": "",
+  "repository": "https://github.com/jeremylshepherd/fcc-weather-server",
   "author": "Jeremy L. Shepherd <jeremylshepherd@gmail.com>",
   "dependencies": {
     "body-parser": "^1.14.2",
